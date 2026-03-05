@@ -323,11 +323,11 @@ export default function App() {
       return newTodo;
     }
 
-    // Logged-in mode: use the API
+    // Logged-in mode: optimistic update then sync
     try {
       let targetListId = currentListId;
 
-      // If no lists exist, auto-create one on the server
+      // If no lists exist, auto-create one on the server (must wait for this)
       if (lists.length === 0 || !targetListId) {
         const listCount = lists.filter(l => /^List \d+$/.test(l.name)).length + 1;
         const newList = await apiFetch('/api/lists', { method: 'POST', body: { name: `List ${listCount}` } });
@@ -336,18 +336,37 @@ export default function App() {
         setCurrentListId(newList.id);
       }
 
-      const created = await apiFetch(`/api/lists/${targetListId}/todos`, { method: 'POST', body: { text: trimmed } });
+      // Optimistic: add a temp todo to UI immediately
+      const tempId = `temp-${Date.now()}`;
+      const tempTodo = { id: tempId, text: trimmed, done: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       setLists((prev) =>
-        prev.map((l) => (l.id === targetListId ? { ...l, todos: [created, ...l.todos] } : l))
+        prev.map((l) => (l.id === targetListId ? { ...l, todos: [tempTodo, ...l.todos] } : l))
       );
+      setAddingIds((prev) => [tempId, ...prev]);
+      setTimeout(() => setAddingIds((prev) => prev.filter((x) => x !== tempId)), 50);
 
-      // animate
-      setAddingIds((prev) => [created.id, ...prev]);
-      setTimeout(() => {
-        setAddingIds((prev) => prev.filter((x) => x !== created.id));
-      }, 50);
+      // Sync to server in background, then replace temp with real
+      apiFetch(`/api/lists/${targetListId}/todos`, { method: 'POST', body: { text: trimmed } })
+        .then((created) => {
+          setLists((prev) =>
+            prev.map((l) => l.id === targetListId
+              ? { ...l, todos: l.todos.map((t) => t.id === tempId ? created : t) }
+              : l
+            )
+          );
+        })
+        .catch((err) => {
+          // Revert on failure
+          setLists((prev) =>
+            prev.map((l) => l.id === targetListId
+              ? { ...l, todos: l.todos.filter((t) => t.id !== tempId) }
+              : l
+            )
+          );
+          console.error('Add todo failed', err);
+        });
 
-      return created;
+      return tempTodo;
     } catch (err) {
       if (err && err.status === 401) setAuthError('Please login to add todos');
       else console.error('Add todo failed', err);
@@ -385,22 +404,24 @@ export default function App() {
       return;
     }
 
-    // If logged in, use the API
-    try {
-      await apiFetch(`/api/todos/${id}`, { method: 'DELETE' });
-      setLists((prev) =>
-        prev.map((list) =>
-          list.id === currentListId
-            ? { ...list, todos: list.todos.filter((t) => t.id !== id) }
-            : list
-        )
-      );
-    } catch (err) {
-      if (err.status === 401) setAuthError('Please login to delete todos');
-      else console.error('Delete todo failed', err);
-    } finally {
-      setRemovingIds((prev) => prev.filter((x) => x !== id));
-    }
+    // Logged-in: optimistic delete then sync
+    const prevLists = lists;
+    setLists((prev) =>
+      prev.map((list) =>
+        list.id === currentListId
+          ? { ...list, todos: list.todos.filter((t) => t.id !== id) }
+          : list
+      )
+    );
+    setRemovingIds((prev) => prev.filter((x) => x !== id));
+
+    // Sync in background
+    apiFetch(`/api/todos/${id}`, { method: 'DELETE' })
+      .catch((err) => {
+        // Revert on failure
+        setLists(prevLists);
+        console.error('Delete todo failed', err);
+      });
   };
 
   // toggle done
@@ -429,20 +450,23 @@ export default function App() {
       return;
     }
 
-    // If logged in, use the API
-    try {
-      const updated = await apiFetch(`/api/todos/${id}`, { method: 'PUT', body: { done: !t.done } });
-      setLists((prev) =>
-        prev.map((l) =>
-          l.id === currentListId
-            ? { ...l, todos: l.todos.map((it) => (it.id === id ? updated : it)) }
-            : l
-        )
-      );
-    } catch (err) {
-      if (err.status === 401) setAuthError('Please login to update todos');
-      else console.error('Toggle todo failed', err);
-    }
+    // Logged-in: optimistic toggle then sync
+    const prevLists = lists;
+    setLists((prev) =>
+      prev.map((l) =>
+        l.id === currentListId
+          ? { ...l, todos: l.todos.map((it) => it.id === id ? { ...it, done: !it.done, updatedAt: new Date().toISOString() } : it) }
+          : l
+      )
+    );
+
+    // Sync in background
+    apiFetch(`/api/todos/${id}`, { method: 'PUT', body: { done: !t.done } })
+      .catch((err) => {
+        // Revert on failure
+        setLists(prevLists);
+        console.error('Toggle todo failed', err);
+      });
   };
 
 
@@ -559,13 +583,10 @@ export default function App() {
   const deleteList = async (listId) => {
     setDeletingListIds((prev) => [...prev, listId]);
 
-    // Sync to server if logged in
+    // Fire-and-forget server delete (UI already animating)
     if (user) {
-      try {
-        await apiFetch(`/api/lists/${listId}`, { method: 'DELETE' });
-      } catch (err) {
-        console.error('Delete list failed', err);
-      }
+      apiFetch(`/api/lists/${listId}`, { method: 'DELETE' })
+        .catch((err) => console.error('Delete list failed', err));
     }
 
     setTimeout(() => {
