@@ -17,6 +17,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_change_this";
 const COOKIE_NAME = "token";
 
 // Middleware
+app.set('trust proxy', 1); // Trust Render's reverse proxy
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
@@ -37,10 +38,11 @@ const authLimiter = rateLimit({
 // Helper: create JWT and set cookie
 function setAuthCookie(res, payload) {
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  const isProduction = process.env.NODE_ENV === "production";
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax", // "none" needed for cross-domain (Vercel <-> Render)
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 }
