@@ -669,9 +669,9 @@ export default function App() {
     const [localTask, setLocalTask] = React.useState('');
     const inputRef = React.useRef(null);
 
-    // Auto-focus when currentListId changes
+    // Auto-focus when currentListId changes (desktop only — avoids mobile keyboard popup)
     React.useEffect(() => {
-      if (inputRef.current) {
+      if (inputRef.current && window.innerWidth >= 768) {
         inputRef.current.focus();
       }
     }, [currentListId]);
@@ -683,8 +683,12 @@ export default function App() {
       try {
         await addTodoText(t);
         setLocalTask('');
-        // keep focus in input after submit
-        inputRef.current && inputRef.current.focus();
+        // keep focus in input after submit (desktop only)
+        if (window.innerWidth >= 768) {
+          inputRef.current && inputRef.current.focus();
+        } else {
+          inputRef.current && inputRef.current.blur();
+        }
       } catch (err) {
         // nothing extra here; parent handles auth errors
       }
