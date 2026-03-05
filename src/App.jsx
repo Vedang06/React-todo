@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 const LoginPrompt = ({ onLoginClick }) => (
   <div style={{
     position: 'fixed',
-    bottom: '16px',
+    bottom: window.innerWidth < 768 ? '88px' : '16px',
     right: '16px',
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     color: '#333',
@@ -955,26 +955,30 @@ export default function App() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             style={{
               position: "fixed",
-              top: 20,
-              right: 20,
-              left: "auto",
+              bottom: 24,
+              right: 24,
               zIndex: 1000,
-              padding: "8px 12px",
+              width: 52,
+              height: 52,
+              padding: 0,
               border: "none",
               background: "#272727",
               color: "#ffffff",
               fontSize: 20,
               cursor: "pointer",
-              borderRadius: 6,
+              borderRadius: "50%",
               display: "flex",
               flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
               gap: 4,
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
             }}
             title="Toggle menu"
           >
-            <div style={{ width: 20, height: 2, background: "#ffffff" }}></div>
-            <div style={{ width: 20, height: 2, background: "#ffffff" }}></div>
-            <div style={{ width: 20, height: 2, background: "#ffffff" }}></div>
+            <div style={{ width: 18, height: 2, background: "#ffffff", borderRadius: 1 }}></div>
+            <div style={{ width: 18, height: 2, background: "#ffffff", borderRadius: 1 }}></div>
+            <div style={{ width: 18, height: 2, background: "#ffffff", borderRadius: 1 }}></div>
           </button>
         )}
 
