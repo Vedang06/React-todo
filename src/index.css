@@ -225,15 +225,26 @@ a {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.list-item-row .list-edit-btn,
 .list-item-row .list-delete-btn {
   opacity: 0;
   pointer-events: none;
   transition: all 120ms ease;
 }
 
+.list-item-row:hover .list-edit-btn,
 .list-item-row:hover .list-delete-btn {
   opacity: 0.4;
   pointer-events: auto;
+}
+
+.list-item-row .list-edit-btn:hover {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.list-item-row .list-edit-btn:active {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .list-item-row .list-delete-btn:hover {

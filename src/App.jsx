@@ -527,6 +527,35 @@ export default function App() {
     );
   }), []);
 
+  // Rename a list via explicit action button instead of inline click-to-edit
+  const renameList = async (listId, newName) => {
+    const trimmed = (newName || '').trim();
+    if (!trimmed) return;
+    setLists((prev) => {
+      const updated = prev.map((list) =>
+        list.id === listId ? { ...list, name: trimmed } : list
+      );
+      if (!user) saveLocalLists(updated);
+      return updated;
+    });
+
+    if (user) {
+      try {
+        await apiFetch(`/api/lists/${listId}`, { method: 'PUT', body: { name: trimmed } });
+      } catch (err) {
+        console.error('Rename list failed', err);
+      }
+    }
+  };
+
+  const handleRenameList = async (list) => {
+    const nextName = window.prompt('Rename list', list.name);
+    if (nextName === null || nextName.trim() === '' || nextName.trim() === list.name) {
+      return;
+    }
+    await renameList(list.id, nextName);
+  };
+
   // Rename a task (works in both guest and logged-in modes)
   const renameTask = async (taskId, newText) => {
     const trimmed = (newText || '').trim();
@@ -1135,7 +1164,7 @@ export default function App() {
                   <div
                     style={{
                       flex: 1,
-                      padding: "10px 12px",
+                      padding: "8px 10px",
                       borderRadius: 6,
                       background: currentListId === list.id ? "#252525" : "transparent",
                       fontSize: 14,
@@ -1153,7 +1182,35 @@ export default function App() {
                   </div>
                 </>
                 <button
-                  onClick={() => deleteList(list.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRenameList(list);
+                  }}
+                  className="list-edit-btn"
+                  style={{
+                    padding: "6px 8px",
+                    borderRadius: 4,
+                    border: "none",
+                    background: "transparent",
+                    color: "#9a9a9a",
+                    fontSize: 16,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  title="Rename list"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11.5 2.5a1.4 1.4 0 0 1 2 2L6 12l-3 .5.5-3 8-7z" />
+                    <path d="M10.5 3.5l2 2" />
+                  </svg>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteList(list.id);
+                  }}
                   className="list-delete-btn"
                   style={{
                     padding: "6px 8px",
