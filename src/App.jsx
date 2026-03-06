@@ -864,8 +864,34 @@ export default function App() {
               style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid #333', background: '#222', color: '#fff' }}
             />
 
-            <button type="submit" disabled={authLoading} style={{ padding: '10px 12px', borderRadius: 8, background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', color: '#111111', fontWeight: 600 }}>
-              {authLoading ? '...' : (parentAuthMode === 'login' ? 'Login' : 'Register')}
+            <button
+              type="submit"
+              disabled={authLoading}
+              style={{
+                padding: '10px 12px',
+                borderRadius: 8,
+                background: '#ffffff',
+                border: '1px solid rgba(0,0,0,0.08)',
+                color: '#111111',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                minHeight: 42,
+              }}
+            >
+              {authLoading ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style={{ display: 'block' }}>
+                    <circle cx="12" cy="12" r="9" fill="none" stroke="rgba(17,17,17,0.2)" strokeWidth="3" />
+                    <path d="M21 12a9 9 0 0 0-9-9" fill="none" stroke="#111111" strokeWidth="3" strokeLinecap="round">
+                      <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite" />
+                    </path>
+                  </svg>
+                  <span>{parentAuthMode === 'login' ? 'Logging in...' : 'Creating account...'}</span>
+                </>
+              ) : (parentAuthMode === 'login' ? 'Login' : 'Register')}
             </button>
           </form>
 
