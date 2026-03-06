@@ -661,16 +661,6 @@ export default function App() {
     }
   };
 
-  // Clear local data
-  const clearLocalData = () => {
-    if (window.confirm("Are you sure you want to clear all local data? This cannot be undone.")) {
-      localStorage.removeItem('guestTodos');
-      localStorage.removeItem('guestLists');
-      setLists([]);
-      setCurrentListId(null);
-    }
-  };
-
   // small layout colors (kept in JS for parity with previous file)
   const bg = "#1f1f1f";
   const text = "#ffffff";
@@ -1234,33 +1224,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Clear Data Button (Bottom of sidebar) */}
-          <div style={{ marginTop: 'auto', paddingTop: 20 }}>
-            <button
-              onClick={clearLocalData}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 6,
-                border: '1px solid #3a3a3a',
-                background: 'transparent',
-                color: '#9a9a9a',
-                fontSize: 13,
-                cursor: 'pointer',
-                transition: 'all 200ms ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#ff6b6b';
-                e.currentTarget.style.color = '#ff6b6b';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#3a3a3a';
-                e.currentTarget.style.color = '#9a9a9a';
-              }}
-            >
-              Clear Local Data
-            </button>
-          </div>
         </div>
 
         {/* Main content - the todo list */}
