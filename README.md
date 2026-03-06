@@ -1,16 +1,35 @@
-# React + Vite
+# Flow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Flow is a clean, minimal to-do app built for people who want to stay organized without extra clutter.
 
-Currently, two official plugins are available:
+It is designed around a simple workflow: create lists, add tasks, keep things moving, and stay focused.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What The App Does
 
-## React Compiler
+- Create multiple lists for different areas of work or life
+- Add, complete, rename, reorder, and delete tasks
+- Organize tasks with a simple drag-and-drop flow
+- Rename and manage lists from the sidebar
+- Use the app casually as a guest or sign in to keep your data with you
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Experience
 
-## Expanding the ESLint configuration
+Flow is meant to feel lightweight, fast, and distraction-free.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Clean dark interface
+- Mobile-friendly layout
+- Smooth interactions and subtle animations
+- Quick task capture with minimal friction
+
+## Why Flow
+
+Many to-do apps become too heavy for everyday use. Flow keeps the core experience simple:
+
+- make a list
+- add what matters
+- finish it
+- move on
+
+## Overview
+
+Flow is a personal task manager for everyday planning, quick capture, and simple list-based organization.
