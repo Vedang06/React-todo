@@ -527,25 +527,6 @@ export default function App() {
     );
   }), []);
 
-  // Rename a list (works in both guest and logged-in modes)
-  const renameList = async (listId, newName) => {
-    const trimmed = (newName || '').trim();
-    if (!trimmed) return;
-    setLists((prev) => {
-      const updated = prev.map((l) => l.id === listId ? { ...l, name: trimmed } : l);
-      if (!user) saveLocalLists(updated);
-      return updated;
-    });
-    // Sync to server if logged in
-    if (user) {
-      try {
-        await apiFetch(`/api/lists/${listId}`, { method: 'PUT', body: { name: trimmed } });
-      } catch (err) {
-        console.error('Rename list failed', err);
-      }
-    }
-  };
-
   // Rename a task (works in both guest and logged-in modes)
   const renameTask = async (taskId, newText) => {
     const trimmed = (newText || '').trim();
@@ -1118,8 +1099,10 @@ export default function App() {
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
+                  padding: "2px 0",
+                  borderRadius: 8,
                   opacity: draggedListId === list.id ? 0.5 : 1,
-                  transition: "opacity 150ms ease",
+                  transition: "opacity 150ms ease, background-color 120ms ease",
                   cursor: "pointer",
                 }}
               >
@@ -1149,64 +1132,7 @@ export default function App() {
                       <circle cx="10" cy="13" r="1.5" />
                     </svg>
                   </div>
-                  <input
-                    ref={(el) => {
-                      if (!el) return;
-                      // Save handler: Enter key or click outside
-                      el._listId = list.id;
-                      el._origName = list.name;
-                    }}
-                    type="text"
-                    defaultValue={list.name}
-                    key={`list-name-${list.id}-${list.name}`}
-                    className="inline-edit-list"
-                    onClick={(e) => {
-                      setCurrentListId(list.id);
-                      e.stopPropagation();
-                    }}
-                    onFocus={(e) => {
-                      setCurrentListId(list.id);
-                      const input = e.currentTarget;
-                      // Listen for clicks outside while focused
-                      const handleOutsideClick = (evt) => {
-                        if (evt.target !== input) {
-                          const newName = input.value.trim();
-                          if (newName && newName !== input._origName) {
-                            renameList(input._listId, newName);
-                          } else {
-                            input.value = input._origName;
-                          }
-                          document.removeEventListener('mousedown', handleOutsideClick);
-                        }
-                      };
-                      // Remove any previous listener to avoid duplicates
-                      if (input._outsideClickHandler) {
-                        document.removeEventListener('mousedown', input._outsideClickHandler);
-                      }
-                      input._outsideClickHandler = handleOutsideClick;
-                      document.addEventListener('mousedown', handleOutsideClick);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        const newName = e.currentTarget.value.trim();
-                        if (newName && newName !== list.name) {
-                          renameList(list.id, newName);
-                        } else {
-                          e.currentTarget.value = list.name;
-                        }
-                        e.currentTarget.blur();
-                        if (e.currentTarget._outsideClickHandler) {
-                          document.removeEventListener('mousedown', e.currentTarget._outsideClickHandler);
-                        }
-                      }
-                      if (e.key === "Escape") {
-                        e.currentTarget.value = list.name;
-                        e.currentTarget.blur();
-                        if (e.currentTarget._outsideClickHandler) {
-                          document.removeEventListener('mousedown', e.currentTarget._outsideClickHandler);
-                        }
-                      }
-                    }}
+                  <div
                     style={{
                       flex: 1,
                       padding: "10px 12px",
@@ -1216,13 +1142,15 @@ export default function App() {
                       fontWeight: currentListId === list.id ? 600 : 400,
                       fontFamily: "inherit",
                       color: "#fff",
-                      outline: "none",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
+                      userSelect: "none",
                     }}
                     title={list.name}
-                  />
+                  >
+                    {list.name}
+                  </div>
                 </>
                 <button
                   onClick={() => deleteList(list.id)}

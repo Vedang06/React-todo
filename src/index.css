@@ -206,18 +206,6 @@ a {
   }
 }
 
-/* Inline-editable list name input */
-.inline-edit-list {
-  border: 1px solid transparent !important;
-  transition: border-color 120ms ease;
-  cursor: default !important;
-}
-
-.inline-edit-list:focus {
-  border-color: #555 !important;
-  cursor: text !important;
-}
-
 /* Inline-editable task text input */
 .inline-edit-task {
   border: 1px solid transparent !important;
@@ -229,6 +217,14 @@ a {
 }
 
 /* List item: show delete button on hover via CSS (no JS re-renders) */
+.list-item-row {
+  transition: background-color 120ms ease;
+}
+
+.list-item-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .list-item-row .list-delete-btn {
   opacity: 0;
   pointer-events: none;
