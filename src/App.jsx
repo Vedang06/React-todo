@@ -958,7 +958,7 @@ export default function App() {
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{ color: '#9a9a9a' }}>Hello, <strong style={{ color: '#fff' }}>{user.username}</strong></span>
-              <button onClick={logout} style={{ padding: '6px 10px', borderRadius: 6, background: '#272727', border: '1px solid #444', color: '#fff' }}>Logout</button>
+              <button onClick={logout} style={{ padding: '6px 10px', borderRadius: 6, background: '#272727', border: '1px solid #444', color: '#fff', cursor: 'pointer' }}>Logout</button>
             </div>
           )}
         </div>
